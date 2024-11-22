@@ -1,0 +1,47 @@
+tasks.register("groovyTask") {
+    println("registering in groovy project")
+    doLast {
+        accessPropertyExpectToThrow(
+            "In Groovy 'parentExtProperty' property value on root project object directly",
+        ) { rootProject.parentExtProperty }
+        accessPropertyExpectValue(
+            "In Groovy 'parentExtraProperty' property value on root project object directly",
+            "extra"
+        ) { rootProject.parentExtraProperty }
+        accessPropertyExpectToThrow(
+            "In Groovy 'parentExtProperty' property value on root project ext object",
+        ) { rootProject.ext.parentExtProperty }
+        accessPropertyExpectValue(
+            "In Groovy 'parentExtraProperty' property value on root project ext object",
+            "extra"
+        ) { rootProject.ext.parentExtraProperty }
+        accessPropertyExpectToThrow(
+            "In Groovy 'parentExtProperty' property value on root project extra object",
+        ) { rootProject.extra.parentExtProperty }
+        accessPropertyExpectToThrow(
+            "In Groovy 'parentExtraProperty' property value on root project extra object",
+        ) { rootProject.extra.parentExtraProperty }
+    }
+}
+
+def accessPropertyExpectValue(String accessDescription, expectedValue, Closure accessLambda) {
+    try {
+        def value = accessLambda()
+        def result
+        if (value == expectedValue) result = "PASS" else result = "FAIL"
+        println("$accessDescription: got value '$value'; expected '$expectedValue'; $result")
+    }
+    catch(Throwable t) {
+        println("$accessDescription: threw ${t.getClass().simpleName}; expected '$expectedValue'; FAIL")
+    }
+}
+
+def accessPropertyExpectToThrow(String accessDescription, Closure accessLambda) {
+    try {
+        def value = accessLambda()
+        println("$accessDescription: got value '$value'; expected to throw; FAIL")
+    }
+    catch(Throwable t) {
+        println("$accessDescription: threw ${t.getClass().simpleName}; expected to throw; PASS")
+    }
+}
